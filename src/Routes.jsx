@@ -9,7 +9,7 @@ import AdminProductManagement from './pages/admin-product-management';
 import StyleRecommendations from './pages/style-recommendations';
 import PhotoUploadAnalysis from './pages/photo-upload-analysis';
 import UserSessionHistory from './pages/user-session-history';
-
+import VirtualTryOnPage from "pages/virtual-tryon";
 const Routes = () => {
   return (
     <BrowserRouter>
@@ -18,6 +18,7 @@ const Routes = () => {
       <RouterRoutes>
         {/* Define your route here */}
         <Route path="/" element={<AdminProductManagement />} />
+        <Route path="/virtual-tryon" element={<VirtualTryOnPage />} />
         <Route path="/analytics-dashboard" element={<AnalyticsDashboard />} />
         <Route path="/product-detail-modal" element={<ProductDetailModal />} />
         <Route path="/admin-product-management" element={<AdminProductManagement />} />
