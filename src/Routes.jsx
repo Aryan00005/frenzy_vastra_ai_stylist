@@ -16,8 +16,7 @@ const Routes = () => {
       <ErrorBoundary>
       <ScrollToTop />
       <RouterRoutes>
-        {/* Define your route here */}
-        <Route path="/" element={<AdminProductManagement />} />
+        <Route path="/" element={<VirtualTryOnPage />} />
         <Route path="/virtual-tryon" element={<VirtualTryOnPage />} />
         <Route path="/analytics-dashboard" element={<AnalyticsDashboard />} />
         <Route path="/product-detail-modal" element={<ProductDetailModal />} />
