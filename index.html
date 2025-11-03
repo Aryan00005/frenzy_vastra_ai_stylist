@@ -15,7 +15,43 @@
   <link rel="icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" href="/favicon.ico" />
   <link rel="manifest" href="/manifest.json" />
-<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffrenzyvas5624back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.8"></script>
+  <script>
+    // Load yw_manifest.json and inject into globalThis.ywConfig
+    (async function() {
+      try {
+        const response = await fetch('/yw_manifest.json');
+        const config = await response.json();
+        
+        // Convert template strings to functions
+        function processConfig(obj) {
+          if (typeof obj !== 'object' || obj === null) return obj;
+          
+          const processed = Array.isArray(obj) ? [] : {};
+          for (const key in obj) {
+            const value = obj[key];
+            if (typeof value === 'string' && value.includes('${')) {
+              // Convert template string to function
+              const vars = value.match(/\$\{(\w+)\}/g)?.map(v => v.slice(2, -1)) || [];
+              const uniqueVars = [...new Set(vars)];
+              const funcBody = `return \`${value}\`;`;
+              processed[key] = new Function(...uniqueVars, funcBody);
+            } else if (typeof value === 'object' && value !== null) {
+              processed[key] = processConfig(value);
+            } else {
+              processed[key] = value;
+            }
+          }
+          return processed;
+        }
+        
+        globalThis.ywConfig = processConfig(config);
+        console.log('✅ ywConfig loaded successfully:', globalThis.ywConfig);
+      } catch (error) {
+        console.error('❌ Failed to load yw_manifest.json:', error);
+        globalThis.ywConfig = undefined;
+      }
+    })();
+  </script>
 </head>
 
 <body>

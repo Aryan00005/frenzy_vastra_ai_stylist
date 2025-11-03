@@ -10,6 +10,7 @@ import StyleRecommendations from './pages/style-recommendations';
 import PhotoUploadAnalysis from './pages/photo-upload-analysis';
 import UserSessionHistory from './pages/user-session-history';
 import VirtualTryOnPage from "pages/virtual-tryon";
+import TestClothSwap from "./pages/TestClothSwap";
 const Routes = () => {
   return (
     <BrowserRouter>
@@ -18,6 +19,7 @@ const Routes = () => {
       <RouterRoutes>
         <Route path="/" element={<VirtualTryOnPage />} />
         <Route path="/virtual-tryon" element={<VirtualTryOnPage />} />
+        <Route path="/test-cloth-swap" element={<TestClothSwap />} />
         <Route path="/analytics-dashboard" element={<AnalyticsDashboard />} />
         <Route path="/product-detail-modal" element={<ProductDetailModal />} />
         <Route path="/admin-product-management" element={<AdminProductManagement />} />

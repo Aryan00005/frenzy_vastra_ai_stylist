@@ -19,6 +19,40 @@ export function useClothSwap() {
       retryAttempt: retryCount + 1
     });
 
+    // Check if running in Youware platform environment
+    const isYouwarePlatform = window.location.hostname.includes('youware.com') || 
+                               window.location.hostname.includes('youware.new') ||
+                               window.self !== window.top; // Running in iframe
+    
+    if (!isYouwarePlatform) {
+      console.info('💡 Not running on Youware platform - redirecting to platform view');
+      
+      // Instead of showing error, redirect to Youware platform
+      // Get project ID from the current URL or use a default
+      const projectId = '2ba780fc-4d2b-4300-b7aa-9f07f2856e75'; // Current project ID
+      
+      // Convert image file to data URL for passing in URL params
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageDataUrl = reader.result;
+        
+        // Create a URL with the image data and product info as parameters
+        const params = new URLSearchParams({
+          productName: product.name,
+          productId: product.id || 'demo',
+          imageData: imageDataUrl.substring(0, 1000) // Truncate for URL length
+        });
+        
+        // Open the Youware platform page
+        const youwareUrl = `https://youware.com/projects/${projectId}?${params.toString()}`;
+        window.open(youwareUrl, '_blank');
+      };
+      reader.readAsDataURL(userImageFile);
+      
+      setIsSwapping(false);
+      return null; // Don't throw error, just return
+    }
+
     // Validate ywConfig exists
     if (!globalThis.ywConfig) {
       const errorMsg = '⚠️ Configuration Error: ywConfig not found. Please ensure yw_manifest.json is properly loaded.';
@@ -168,12 +202,18 @@ export function useClothSwap() {
         throw new Error(errorMsg);
       }
     } catch (err) {
-      // Network or fetch errors
+      // Network or fetch errors - likely CORS or platform context issues
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        const errorMsg = '⚠️ Network error: Unable to connect to AI service. Please check your internet connection.';
-        console.error('❌ Network Error:', {
+        const errorMsg = '⚠️ Platform Error: Unable to connect to Youware AI service.\n\n' +
+                         'This usually means you\'re testing locally. AI features require:\n' +
+                         '1. Running on Youware platform (youware.com)\n' +
+                         '2. Proper platform authentication headers\n' +
+                         '3. CORS permissions from Youware servers\n\n' +
+                         '💡 Solution: Deploy this project to Youware platform to test AI features.';
+        console.error('❌ Network/CORS Error:', {
           error: err.message,
           name: err.name,
+          hint: 'Deploy to Youware platform for AI functionality',
           processingTime: `${Date.now() - startTime}ms`
         });
         setError(errorMsg);

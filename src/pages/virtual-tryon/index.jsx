@@ -158,7 +158,11 @@ export default function VirtualTryOnPage() {
       if (selectedProduct) {
         try {
           resetError(); // Clear any previous errors
-          await swapClothing(file, selectedProduct);
+          const result = await swapClothing(file, selectedProduct);
+          // If result is null, it means user was redirected to Youware platform
+          if (result === null) {
+            console.log('Redirected to Youware platform for AI processing');
+          }
         } catch (error) {
           console.error('Cloth swap failed:', error);
           // Error is now handled by the hook with detailed logging
@@ -192,7 +196,11 @@ export default function VirtualTryOnPage() {
     if (uploadedImage && inputMode === 'upload') {
       try {
         resetError(); // Clear any previous errors
-        await swapClothing(uploadedImage, product);
+        const result = await swapClothing(uploadedImage, product);
+        // If result is null, it means user was redirected to Youware platform
+        if (result === null) {
+          console.log('Redirected to Youware platform for AI processing');
+        }
       } catch (error) {
         console.error('Cloth swap failed:', error);
         // Error is now handled by the hook with detailed logging
