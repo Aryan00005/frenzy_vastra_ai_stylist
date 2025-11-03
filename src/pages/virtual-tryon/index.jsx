@@ -8,6 +8,7 @@ import { VirtualTryOnCanvas } from '../../components/tryon/VirtualTryOnCanvas';
 import { ProductSelector } from '../../components/tryon/ProductSelector';
 import { tryonService } from '../../services/tryonService';
 import { initializeDemoProducts } from '../../utils/demoProducts';
+import { useClothSwap } from '../../hooks/useClothSwap';
 
 export default function VirtualTryOnPage() {
   const [inputMode, setInputMode] = useState('webcam');
@@ -26,6 +27,9 @@ export default function VirtualTryOnPage() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const interactionStartTimeRef = useRef(null);
+  
+  // AI Cloth Swap Hook
+  const { swappedImage, swapClothing, isSwapping, error: swapError, resetError } = useClothSwap();
 
   useEffect(() => {
     loadProducts();
@@ -143,12 +147,24 @@ export default function VirtualTryOnPage() {
     }
   };
 
-  const handleImageSelect = (file, dataUrl) => {
+  const handleImageSelect = async (file, dataUrl) => {
     if (file && dataUrl) {
       setUploadedImage(file);
       setUploadedImageUrl(dataUrl);
       setIsTracking(true);
       setIsWebcamActive(false);
+      
+      // If a product is already selected, trigger AI cloth swap
+      if (selectedProduct) {
+        try {
+          resetError(); // Clear any previous errors
+          await swapClothing(file, selectedProduct);
+        } catch (error) {
+          console.error('Cloth swap failed:', error);
+          // Error is now handled by the hook with detailed logging
+          // Don't show alert here - let the UI display the error message
+        }
+      }
     } else {
       setUploadedImage(null);
       setUploadedImageUrl(null);
@@ -164,19 +180,38 @@ export default function VirtualTryOnPage() {
     setInputMode('upload');
   };
 
-  const handleProductSelect = (product) => {
+  const handleProductSelect = async (product) => {
     setSelectedProduct(product);
     setSelectedVariation(null);
 
     if (product.variations && product.variations.length > 0) {
       setSelectedVariation(product.variations[0]);
     }
+    
+    // If user has uploaded an image, trigger AI cloth swap
+    if (uploadedImage && inputMode === 'upload') {
+      try {
+        resetError(); // Clear any previous errors
+        await swapClothing(uploadedImage, product);
+      } catch (error) {
+        console.error('Cloth swap failed:', error);
+        // Error is now handled by the hook with detailed logging
+        // Don't show alert here - let the UI display the error message
+      }
+    }
   };
 
   const handleScreenshot = async () => {
-    if (!canvasRef.current) return;
-
     try {
+      // For upload mode with swapped image
+      if (inputMode === 'upload' && swappedImage) {
+        await downloadImageFromUrl(swappedImage);
+        return;
+      }
+
+      // For webcam mode with canvas
+      if (!canvasRef.current) return;
+
       const canvas = canvasRef.current;
 
       canvas.toBlob(async (blob) => {
@@ -199,10 +234,62 @@ export default function VirtualTryOnPage() {
     }
   };
 
-  const handleShare = async () => {
-    if (!canvasRef.current) return;
-
+  const downloadImageFromUrl = async (imageUrl) => {
     try {
+      // If it's a base64 image, convert directly
+      if (imageUrl.startsWith('data:')) {
+        const link = document.createElement('a');
+        link.href = imageUrl;
+        link.download = `virtual-tryon-${Date.now()}.png`;
+        link.click();
+        return;
+      }
+
+      // For regular URLs, fetch and download
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `virtual-tryon-${Date.now()}.png`;
+      link.click();
+      
+      // Clean up
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    } catch (error) {
+      console.error('Failed to download image:', error);
+      alert('Failed to download image. Please try again.');
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      // For upload mode with swapped image
+      if (inputMode === 'upload' && swappedImage) {
+        // Try to convert base64 to blob for sharing
+        if (swappedImage.startsWith('data:')) {
+          const response = await fetch(swappedImage);
+          const blob = await response.blob();
+          const file = new File([blob], 'virtual-tryon.png', { type: 'image/png' });
+
+          if (navigator.share && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'Virtual Try-On',
+              text: `Check out how I look with ${selectedProduct?.name}!`
+            });
+            return;
+          }
+        }
+        // Fallback to download
+        handleScreenshot();
+        return;
+      }
+
+      // For webcam mode with canvas
+      if (!canvasRef.current) return;
+
       const canvas = canvasRef.current;
 
       canvas.toBlob(async (blob) => {
@@ -374,19 +461,50 @@ export default function VirtualTryOnPage() {
                         <ImageUploader onImageSelect={handleImageSelect} />
                       ) : (
                         <div className="space-y-4">
-                          <VirtualTryOnCanvas
-                            ref={canvasRef}
-                            imageSource={uploadedImageUrl}
-                            selectedProduct={selectedProduct}
-                            selectedVariation={selectedVariation}
-                            isTracking={isTracking}
-                          />
+                          {isSwapping && (
+                            <div className="text-center py-4">
+                              <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-lg">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                                <span className="text-sm font-medium text-purple-900">AI is swapping your outfit...</span>
+                              </div>
+                            </div>
+                          )}
+
+                          {swapError && (
+                            <div className="text-center py-4">
+                              <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 rounded-lg">
+                                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-sm font-medium text-red-900">{swapError}</span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="relative">
+                            <img
+                              src={swappedImage || uploadedImageUrl}
+                              alt="Try-on result"
+                              className="w-full h-auto rounded-lg"
+                            />
+                            {isSwapping && (
+                              <div className="absolute inset-0 bg-purple-900/20 rounded-lg flex items-center justify-center">
+                                <div className="bg-white px-4 py-2 rounded-lg shadow-lg">
+                                  <div className="flex items-center gap-2">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                                    <span className="text-sm font-medium">Processing...</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
 
                           <div className="flex gap-3">
                             <Button
                               onClick={() => handleImageSelect(null, null)}
                               variant="outline"
                               className="flex-1 bg-white hover:bg-gray-50"
+                              disabled={isSwapping}
                             >
                               Change Photo
                             </Button>
@@ -395,18 +513,19 @@ export default function VirtualTryOnPage() {
                               onClick={handleScreenshot}
                               variant="default"
                               className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                              disabled={isSwapping || !swappedImage}
                             >
                               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                               </svg>
-                              Screenshot
+                              Download
                             </Button>
 
                             <Button
                               onClick={handleShare}
                               variant="outline"
                               className="flex-1 bg-white hover:bg-gray-50"
+                              disabled={isSwapping || !swappedImage}
                             >
                               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />

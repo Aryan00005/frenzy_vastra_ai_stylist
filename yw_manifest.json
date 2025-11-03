@@ -1,0 +1,10 @@
+{
+  "ai_config": {
+    "cloth_swap": {
+      "model": "gpt-image-1",
+      "response_format": "b64_json",
+      "size": "1024x1024",
+      "prompt_template": "Replace the person's clothing with ${productName}. Make it look natural and realistic. The clothing should fit properly on the person. Product description: ${description}. Style: professional fashion photography."
+    }
+  }
+}

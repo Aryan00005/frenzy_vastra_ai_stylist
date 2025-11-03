@@ -7,7 +7,19 @@ export const ImageUploader = ({ onImageSelect }) => {
   const [dragActive, setDragActive] = useState(false);
 
   const handleFileSelect = (file) => {
-    if (!file || !file.type.startsWith('image/')) {
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type.toLowerCase())) {
+      alert('Please upload a valid image file (JPG, PNG, or WEBP)');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('File size must be less than 10MB');
       return;
     }
 
@@ -15,6 +27,9 @@ export const ImageUploader = ({ onImageSelect }) => {
     reader.onload = (e) => {
       setPreview(e.target.result);
       onImageSelect(file, e.target.result);
+    };
+    reader.onerror = () => {
+      alert('Failed to read file. Please try again.');
     };
     reader.readAsDataURL(file);
   };
@@ -65,7 +80,7 @@ export const ImageUploader = ({ onImageSelect }) => {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
         onChange={handleChange}
         className="hidden"
       />

@@ -62,7 +62,7 @@ export const ProductSelector = ({
                     >
                       <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg mb-2 overflow-hidden">
                         <img
-                          src={product.image_url}
+                          src={product.overlay_image_url || product.image_url}
                           alt={product.name}
                           className="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-110"
                         />
@@ -81,7 +81,7 @@ export const ProductSelector = ({
                         <p className={`text-xs font-bold ${
                           selectedProduct?.id === product.id ? 'text-white/90' : 'text-purple-600'
                         }`}>
-                          ${product.base_price?.toFixed(2)}
+                          ₹{product.base_price || 0}
                         </p>
 
                         {selectedProduct?.id === product.id && (
@@ -167,14 +167,14 @@ export const ProductSelector = ({
                       <p className={`text-xs font-bold ${
                         selectedVariation?.id === variation.id ? 'text-white/90' : 'text-purple-600'
                       }`}>
-                        ${(selectedProduct.base_price + (variation.price_modifier || 0)).toFixed(2)}
+                        ₹{(selectedProduct.base_price + (variation.price_modifier || 0))}
                       </p>
                       
                       {variation.price_modifier > 0 && (
                         <span className={`text-xs ${
                           selectedVariation?.id === variation.id ? 'text-white/80' : 'text-gray-500'
                         }`}>
-                          (+${variation.price_modifier})
+                          (+₹{variation.price_modifier})
                         </span>
                       )}
                     </div>
