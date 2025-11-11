@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import Icon from '../AppIcon';
 import Button from './Button';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const navigationItems = [
     {
@@ -87,16 +89,33 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle mobile menu"
-        >
-          <Icon name={isMobileMenuOpen ? 'X' : 'Menu'} size={20} />
-        </Button>
+        {/* User Menu & Mobile Menu Button */}
+        <div className="flex items-center space-x-2">
+          {user && (
+            <div className="hidden md:flex items-center space-x-3">
+              <span className="text-sm text-text-secondary">
+                Welcome, {user.name}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+              >
+                Logout
+              </Button>
+            </div>
+          )}
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            <Icon name={isMobileMenuOpen ? 'X' : 'Menu'} size={20} />
+          </Button>
+        </div>
       </div>
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
@@ -124,6 +143,28 @@ const Header = () => {
                 </div>
               </Link>
             ))}
+            
+            {user && (
+              <div className="border-t border-border pt-2 mt-2">
+                <div className="px-4 py-2">
+                  <span className="text-sm text-text-secondary">
+                    Welcome, {user.name}
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  fullWidth
+                  onClick={() => {
+                    logout();
+                    closeMobileMenu();
+                  }}
+                  className="mx-4"
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
           </nav>
         </div>
       )}

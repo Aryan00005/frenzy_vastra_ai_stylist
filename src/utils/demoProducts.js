@@ -4,98 +4,100 @@
 
 const demoProductsData = [
   {
-    id: 'demo-1',
-    name: 'Floral Summer Dress',
-    category: 'clothing',
-    subcategory: 'dress',
-    description: 'Beautiful floral print summer dress perfect for outdoor events',
-    base_price: 2499,
-    scale_factor: 1.2,
-    variations: [
-      {
-        id: 'demo-1-var-1',
-        color: 'Floral Blue',
-        size: 'M',
-        variation_name: 'Floral Blue - M',
-        price_modifier: 0,
-        stock_quantity: 10,
-        is_available: true,
-        overlay_image_url: 'https://public.youware.com/users-website-assets/prod/afe1f57c-8b6d-41b8-a571-1b096865a82c/ccd1fb334b9a4a539afcdc5b005b8ec0.jpg'
-      },
-      {
-        id: 'demo-1-var-2',
-        color: 'Floral Pink',
-        size: 'M',
-        variation_name: 'Floral Pink - M',
-        price_modifier: 200,
-        stock_quantity: 8,
-        is_available: true,
-        overlay_image_url: 'https://public.youware.com/users-website-assets/prod/afe1f57c-8b6d-41b8-a571-1b096865a82c/ccd1fb334b9a4a539afcdc5b005b8ec0.jpg'
-      }
-    ]
-  },
-  {
-    id: 'demo-2',
+    id: 'shirt-1',
     name: 'Classic White Shirt',
     category: 'clothing',
     subcategory: 'shirt',
-    description: 'Elegant white button-down shirt for formal and casual occasions',
+    description: 'Crisp white button-down shirt perfect for any occasion',
     base_price: 1799,
-    scale_factor: 1.0,
-    variations: [
-      {
-        id: 'demo-2-var-1',
-        color: 'White',
-        size: 'M',
-        variation_name: 'White - M',
-        price_modifier: 0,
-        stock_quantity: 15,
-        is_available: true,
-        overlay_image_url: 'https://public.youware.com/users-website-assets/prod/afe1f57c-8b6d-41b8-a571-1b096865a82c/b1c435f398dc47488e3942f5bf22abde.jpg'
-      }
-    ]
+    colorHex: '#F8FAFC',
+    variations: [{
+      id: 'shirt-1-var-1',
+      color: 'White',
+      colorHex: '#F8FAFC',
+      size: 'M',
+      overlay_image_url: '/api/placeholder/300/400'
+    }]
   },
   {
-    id: 'demo-3',
-    name: 'Casual T-Shirt',
+    id: 'shirt-2', 
+    name: 'Navy Blue Shirt',
     category: 'clothing',
     subcategory: 'shirt',
-    description: 'Comfortable casual t-shirt perfect for everyday wear',
-    base_price: 999,
-    scale_factor: 1.0,
-    variations: [
-      {
-        id: 'demo-3-var-1',
-        color: 'Blue Polo',
-        size: 'M',
-        variation_name: 'Blue Polo - M',
-        price_modifier: 0,
-        stock_quantity: 20,
-        is_available: true,
-        overlay_image_url: 'https://public.youware.com/users-website-assets/prod/afe1f57c-8b6d-41b8-a571-1b096865a82c/8005ea413f004d3393b11f7ea56e74e7.jpg'
-      }
-    ]
+    description: 'Professional navy blue dress shirt',
+    base_price: 1999,
+    colorHex: '#1E3A8A',
+    variations: [{
+      id: 'shirt-2-var-1',
+      color: 'Navy Blue',
+      colorHex: '#1E3A8A',
+      size: 'M',
+      overlay_image_url: '/api/placeholder/300/400'
+    }]
   },
   {
-    id: 'demo-4',
-    name: 'Elegant Black Dress',
+    id: 'tshirt-1',
+    name: 'Red T-Shirt',
+    category: 'clothing', 
+    subcategory: 'tshirt',
+    description: 'Comfortable red cotton t-shirt',
+    base_price: 899,
+    colorHex: '#DC2626',
+    variations: [{
+      id: 'tshirt-1-var-1',
+      color: 'Red',
+      colorHex: '#DC2626',
+      size: 'M',
+      overlay_image_url: '/api/placeholder/300/400'
+    }]
+  },
+  {
+    id: 'tshirt-2',
+    name: 'Green T-Shirt', 
+    category: 'clothing',
+    subcategory: 'tshirt',
+    description: 'Fresh green casual t-shirt',
+    base_price: 899,
+    colorHex: '#16A34A',
+    variations: [{
+      id: 'tshirt-2-var-1',
+      color: 'Green',
+      colorHex: '#16A34A',
+      size: 'M',
+      overlay_image_url: '/api/placeholder/300/400'
+    }]
+  },
+  {
+    id: 'jacket-1',
+    name: 'Black Jacket',
+    category: 'clothing',
+    subcategory: 'jacket', 
+    description: 'Stylish black blazer jacket',
+    base_price: 3999,
+    colorHex: '#1F2937',
+    variations: [{
+      id: 'jacket-1-var-1',
+      color: 'Black',
+      colorHex: '#1F2937',
+      size: 'M',
+      overlay_image_url: '/api/placeholder/300/400'
+    }]
+  },
+  {
+    id: 'dress-1',
+    name: 'Purple Dress',
     category: 'clothing',
     subcategory: 'dress',
-    description: 'Sophisticated black dress for evening events',
-    base_price: 3299,
-    scale_factor: 1.2,
-    variations: [
-      {
-        id: 'demo-4-var-1',
-        color: 'Black',
-        size: 'M',
-        variation_name: 'Black - M',
-        price_modifier: 0,
-        stock_quantity: 12,
-        is_available: true,
-        overlay_image_url: 'https://public.youware.com/users-website-assets/prod/afe1f57c-8b6d-41b8-a571-1b096865a82c/50b357dceccb4be89f9a4b98d247bc46.jpg'
-      }
-    ]
+    description: 'Elegant purple evening dress',
+    base_price: 2999,
+    colorHex: '#7C3AED',
+    variations: [{
+      id: 'dress-1-var-1',
+      color: 'Purple',
+      colorHex: '#7C3AED',
+      size: 'M',
+      overlay_image_url: '/api/placeholder/300/400'
+    }]
   }
 ];
 
@@ -112,14 +114,21 @@ export const initializeDemoProducts = () => {
         category: product.category,
         subcategory: product.subcategory,
         description: product.description,
+        base_price: product.base_price,
         scale_factor: product.scale_factor,
         color: variation.color,
         size: variation.size,
+        image_url: variation.overlay_image_url,
         overlay_image_url: variation.overlay_image_url,
+        colorHex: product.colorHex || variation.colorHex || '#4F46E5',
         variations: product.variations.map(v => ({
           id: v.id,
           color: v.color,
           size: v.size,
+          variation_name: v.variation_name,
+          price_modifier: v.price_modifier,
+          stock_quantity: v.stock_quantity,
+          is_available: v.is_available,
           overlay_image_url: v.overlay_image_url
         }))
       });
