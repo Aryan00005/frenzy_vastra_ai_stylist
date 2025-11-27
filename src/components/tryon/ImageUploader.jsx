@@ -2,75 +2,94 @@ import React, { useRef, useState } from 'react';
 import Button from '../ui/Button';
 
 export const ImageUploader = ({ onImageSelect }) => {
-  const fileInputRef = useRef(null);
-  const [preview, setPreview] = useState(null);
-  const [dragActive, setDragActive] = useState(false);
+  const fileInput = useRef(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileSelect = (file) => {
-    if (!file) return;
+  const processSelectedFile = (selectedFile) => {
+    if (!selectedFile) {
+      return;
+    }
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type.toLowerCase())) {
+    // Check if file type is valid
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const fileType = selectedFile.type.toLowerCase();
+    let isValidType = false;
+    
+    for (let i = 0; i < allowedTypes.length; i++) {
+      if (fileType === allowedTypes[i]) {
+        isValidType = true;
+        break;
+      }
+    }
+    
+    if (!isValidType) {
       alert('Please upload a valid image file (JPG, PNG, or WEBP)');
       return;
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
+    // Check file size (max 10MB)
+    const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (selectedFile.size > maxFileSize) {
       alert('File size must be less than 10MB');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreview(e.target.result);
-      onImageSelect(file, e.target.result);
+    // Read the file and create preview
+    const fileReader = new FileReader();
+    
+    fileReader.onload = (event) => {
+      const imageDataUrl = event.target.result;
+      setImagePreview(imageDataUrl);
+      onImageSelect(selectedFile, imageDataUrl);
     };
-    reader.onerror = () => {
+    
+    fileReader.onerror = () => {
       alert('Failed to read file. Please try again.');
     };
-    reader.readAsDataURL(file);
+    
+    fileReader.readAsDataURL(selectedFile);
   };
 
-  const handleChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleFileSelect(file);
+  const handleFileInputChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      processSelectedFile(selectedFile);
     }
   };
 
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleDragEvents = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
+    if (event.type === 'dragenter' || event.type === 'dragover') {
+      setIsDragging(true);
+    } else if (event.type === 'dragleave') {
+      setIsDragging(false);
     }
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+  const handleFileDrop = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
 
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFileSelect(file);
+    const droppedFile = event.dataTransfer.files[0];
+    if (droppedFile) {
+      processSelectedFile(droppedFile);
     }
   };
 
-  const handleClick = () => {
-    fileInputRef.current?.click();
+  const openFileDialog = () => {
+    if (fileInput.current) {
+      fileInput.current.click();
+    }
   };
 
-  const handleClear = () => {
-    setPreview(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  const clearSelectedImage = () => {
+    setImagePreview(null);
+    if (fileInput.current) {
+      fileInput.current.value = '';
     }
     onImageSelect(null, null);
   };
@@ -78,25 +97,25 @@ export const ImageUploader = ({ onImageSelect }) => {
   return (
     <div className="w-full">
       <input
-        ref={fileInputRef}
+        ref={fileInput}
         type="file"
         accept="image/jpeg,image/jpg,image/png,image/webp"
-        onChange={handleChange}
+        onChange={handleFileInputChange}
         className="hidden"
       />
 
-      {!preview ? (
+      {!imagePreview ? (
         <div
           className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-            dragActive
+            isDragging
               ? 'border-blue-500 bg-blue-50'
               : 'border-gray-300 bg-gray-50 hover:border-gray-400'
           }`}
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-          onClick={handleClick}
+          onDragEnter={handleDragEvents}
+          onDragLeave={handleDragEvents}
+          onDragOver={handleDragEvents}
+          onDrop={handleFileDrop}
+          onClick={openFileDialog}
         >
           <div className="flex flex-col items-center gap-4">
             <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
@@ -133,17 +152,17 @@ export const ImageUploader = ({ onImageSelect }) => {
         <div className="relative">
           <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video">
             <img
-              src={preview}
+              src={imagePreview}
               alt="Preview"
               className="w-full h-full object-cover"
             />
           </div>
 
           <div className="mt-4 flex gap-3">
-            <Button onClick={handleClick} variant="outline" className="flex-1">
+            <Button onClick={openFileDialog} variant="outline" className="flex-1">
               Change Photo
             </Button>
-            <Button onClick={handleClear} variant="outline" className="flex-1">
+            <Button onClick={clearSelectedImage} variant="outline" className="flex-1">
               Clear
             </Button>
           </div>

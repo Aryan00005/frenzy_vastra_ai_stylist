@@ -4,8 +4,9 @@ import { useAuth } from '../contexts/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  const location = useLocation();
+  const currentLocation = useLocation();
 
+  // Show loading spinner while checking auth
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -14,10 +15,12 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
+  // If no user is logged in, redirect to login page
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: currentLocation }} replace />;
   }
 
+  // User is logged in, show the protected content
   return children;
 };
 

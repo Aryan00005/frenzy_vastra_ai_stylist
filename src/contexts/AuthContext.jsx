@@ -10,6 +10,14 @@ const DEMO_ACCOUNT = {
   role: 'user'
 };
 
+// Admin account credentials
+const ADMIN_ACCOUNT = {
+  email: 'admin@example.com',
+  password: 'admin123',
+  name: 'Admin User',
+  role: 'admin'
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +38,18 @@ export const AuthProvider = ({ children }) => {
         email: DEMO_ACCOUNT.email,
         name: DEMO_ACCOUNT.name,
         role: DEMO_ACCOUNT.role
+      };
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      return { success: true };
+    }
+    
+    // Check admin account
+    if (email === ADMIN_ACCOUNT.email && password === ADMIN_ACCOUNT.password) {
+      const userData = {
+        email: ADMIN_ACCOUNT.email,
+        name: ADMIN_ACCOUNT.name,
+        role: ADMIN_ACCOUNT.role
       };
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
@@ -58,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
     
     // Check if user already exists
-    if (users.find(u => u.email === email) || email === DEMO_ACCOUNT.email) {
+    if (users.find(u => u.email === email) || email === DEMO_ACCOUNT.email || email === ADMIN_ACCOUNT.email) {
       return { success: false, error: 'User already exists' };
     }
     

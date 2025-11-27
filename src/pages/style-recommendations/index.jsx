@@ -8,6 +8,7 @@ import FilterControls from './components/FilterControls';
 import ProductGrid from './components/ProductGrid';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import { aiService } from '../../services/aiService';
 
 const StyleRecommendations = () => {
   const navigate = useNavigate();
@@ -41,14 +42,28 @@ const StyleRecommendations = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Load analysis data from navigation state or localStorage
+  // Load analysis data and get AI recommendations
   useEffect(() => {
-    const loadAnalysisData = () => {
+    const loadAnalysisData = async () => {
       // Try to get data from navigation state first
       const navState = location?.state;
       if (navState?.analysisData) {
         setAnalysisData(navState?.analysisData);
         setSelectedOccasion(navState?.occasion || 'casual');
+        
+        // Get AI recommendations
+        setIsLoading(true);
+        try {
+          const recommendations = await aiService.getRecommendations({
+            body_type: navState.analysisData?.body_type,
+            style_preference: selectedOccasion,
+            occasion: selectedOccasion
+          });
+          console.log('🤖 AI Recommendations:', recommendations);
+        } catch (error) {
+          console.error('AI recommendations failed:', error);
+        }
+        setIsLoading(false);
         return;
       }
 
@@ -61,17 +76,15 @@ const StyleRecommendations = () => {
           setSelectedOccasion(sessionData?.occasion || 'casual');
         } catch (error) {
           console.error('Error loading saved session:', error);
-          // Redirect to photo upload if no valid session
           navigate('/photo-upload-analysis');
         }
       } else {
-        // No analysis data available, redirect to photo upload
         navigate('/photo-upload-analysis');
       }
     };
 
     loadAnalysisData();
-  }, [location?.state, navigate]);
+  }, [location?.state, navigate, selectedOccasion]);
 
   // Mock current session for SessionContextIndicator
   const currentSession = {

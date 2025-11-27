@@ -9,6 +9,7 @@ import { ProductSelector } from '../../components/tryon/ProductSelector';
 import { tryonService } from '../../services/tryonService';
 import { initializeDemoProducts } from '../../utils/demoProducts';
 import { useClothSwap } from '../../hooks/useClothSwap';
+import AITestPanel from '../../components/AITestPanel';
 
 export default function VirtualTryOnPage() {
   const [inputMode, setInputMode] = useState('webcam');
@@ -52,14 +53,25 @@ export default function VirtualTryOnPage() {
     try {
       setLoading(true);
       
-      // Load demo products directly for demo
-      console.log('🛍️ Loading demo products...');
+      console.log('🛍️ Loading products...');
       const demoProducts = initializeDemoProducts();
-      console.log('📦 Demo products loaded:', demoProducts);
+      console.log('📦 Products loaded:', demoProducts.length, 'items');
+      console.log('🔍 First product:', demoProducts[0]);
+      
+      if (demoProducts.length === 0) {
+        console.warn('⚠️ No products loaded!');
+      }
+      
       setProducts(demoProducts);
       
+      // Auto-select first product for testing
+      if (demoProducts.length > 0) {
+        console.log('🎯 Auto-selecting first product for testing');
+        setSelectedProduct(demoProducts[0]);
+      }
+      
     } catch (error) {
-      console.error('Failed to load products:', error);
+      console.error('❌ Failed to load products:', error);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -162,6 +174,14 @@ export default function VirtualTryOnPage() {
 
   const handleProductSelect = async (product) => {
     console.log('🛍️ SELECTING PRODUCT:', product);
+    console.log('🔗 Product image URL:', product.overlay_image_url);
+    console.log('🎨 Product details:', {
+      name: product.name,
+      category: product.category,
+      subcategory: product.subcategory,
+      colorHex: product.colorHex
+    });
+    
     setSelectedProduct(product);
     setSelectedVariation(null);
     
@@ -170,11 +190,19 @@ export default function VirtualTryOnPage() {
     
     if (product.variations && product.variations.length > 0) {
       setSelectedVariation(product.variations[0]);
+      console.log('🔄 Selected variation:', product.variations[0]);
     }
     
-    console.log('✅ Product selected successfully:', product.name);
-    console.log('🎨 Product color:', product.colorHex);
+    console.log('✅ Product selected successfully!');
     console.log('📸 Image uploaded:', !!uploadedImage);
+    
+    // Test image URL accessibility
+    if (product.overlay_image_url) {
+      const img = new Image();
+      img.onload = () => console.log('✅ Product image loads successfully');
+      img.onerror = () => console.error('❌ Product image failed to load');
+      img.src = product.overlay_image_url;
+    }
   };
 
   const handleScreenshot = async () => {
@@ -670,6 +698,9 @@ export default function VirtualTryOnPage() {
             </div>
           </div>
         </main>
+        
+        {/* AI Test Panel - Remove in production */}
+        <AITestPanel />
       </div>
     </>
   );

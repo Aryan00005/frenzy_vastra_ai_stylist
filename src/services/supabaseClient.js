@@ -1,16 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Get Supabase credentials from environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Create a mock client if Supabase credentials are not provided
-// This allows the app to work without Supabase for testing AI features
+// Create Supabase client or mock client
 let supabase;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Supabase credentials not found - using mock client. Some features may be limited.');
+// Check if we have real Supabase credentials
+if (!supabaseUrl || !supabaseKey) {
+  console.warn('Supabase credentials not found - using demo mode');
   
-  // Create a minimal mock client that won't crash the app
+  // Create a fake client for demo purposes
   supabase = {
     from: () => ({
       select: () => Promise.resolve({ data: [], error: null }),
@@ -29,7 +30,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
     }
   };
 } else {
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
+  // Create real Supabase client
+  supabase = createClient(supabaseUrl, supabaseKey);
 }
 
 export { supabase };

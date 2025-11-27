@@ -1,7 +1,10 @@
 import { supabase } from './supabaseClient';
 
-const generateSessionToken = () => {
-  return `session_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+// Function to create a unique session ID
+const createSessionId = () => {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 15);
+  return `session_${timestamp}_${randomString}`;
 };
 
 export const tryonService = {

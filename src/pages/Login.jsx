@@ -7,32 +7,38 @@ import Button from '../components/ui/Button';
 
 const Login = () => {
   const { login, user } = useAuth();
-  const location = useLocation();
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const currentLocation = useLocation();
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  // Redirect if already logged in
+  // If user is already logged in, redirect them
   if (user) {
-    const from = location.state?.from?.pathname || '/';
-    return <Navigate to={from} replace />;
+    let redirectPath = '/';
+    if (currentLocation.state && currentLocation.state.from && currentLocation.state.from.pathname) {
+      redirectPath = currentLocation.state.from.pathname;
+    }
+    return <Navigate to={redirectPath} replace />;
   }
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    setError('');
+  const handleFormSubmit = async (formData) => {
+    setIsLoading(true);
+    setErrorMessage('');
     
-    const result = await login(data.email, data.password);
+    const loginResult = await login(formData.email, formData.password);
     
-    if (result.success) {
-      const from = location.state?.from?.pathname || '/';
-      window.location.href = from;
+    if (loginResult.success) {
+      let redirectPath = '/';
+      if (currentLocation.state && currentLocation.state.from && currentLocation.state.from.pathname) {
+        redirectPath = currentLocation.state.from.pathname;
+      }
+      window.location.href = redirectPath;
     } else {
-      setError(result.error);
+      setErrorMessage(loginResult.error);
     }
     
-    setLoading(false);
+    setIsLoading(false);
   };
 
   return (
@@ -50,15 +56,25 @@ const Login = () => {
           </p>
         </div>
         
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-          <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Account</h3>
-          <p className="text-sm text-blue-700">
-            Email: <span className="font-mono">demo@example.com</span><br />
-            Password: <span className="font-mono">demo123</span>
-          </p>
+        <div className="space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+            <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Account</h3>
+            <p className="text-sm text-blue-700">
+              Email: <span className="font-mono">demo@example.com</span><br />
+              Password: <span className="font-mono">demo123</span>
+            </p>
+          </div>
+          
+          <div className="bg-green-50 border border-green-200 rounded-md p-4">
+            <h3 className="text-sm font-medium text-green-800 mb-2">Admin Account</h3>
+            <p className="text-sm text-green-700">
+              Email: <span className="font-mono">admin@example.com</span><br />
+              Password: <span className="font-mono">admin123</span>
+            </p>
+          </div>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
           <div className="space-y-4">
             <Input
               label="Email address"
@@ -89,17 +105,17 @@ const Login = () => {
             />
           </div>
 
-          {error && (
+          {errorMessage && (
             <div className="text-red-600 text-sm text-center">
-              {error}
+              {errorMessage}
             </div>
           )}
 
           <Button
             type="submit"
             fullWidth
-            loading={loading}
-            disabled={loading}
+            loading={isLoading}
+            disabled={isLoading}
           >
             Sign in
           </Button>

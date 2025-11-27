@@ -8,95 +8,50 @@ const demoProductsData = [
     name: 'Classic White Shirt',
     category: 'clothing',
     subcategory: 'shirt',
-    description: 'Crisp white button-down shirt perfect for any occasion',
+    description: 'Crisp white button-down shirt',
     base_price: 1799,
-    colorHex: '#F8FAFC',
+    colorHex: '#FFFFFF',
+    overlay_image_url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop',
     variations: [{
       id: 'shirt-1-var-1',
       color: 'White',
-      colorHex: '#F8FAFC',
+      colorHex: '#FFFFFF',
       size: 'M',
-      overlay_image_url: '/api/placeholder/300/400'
-    }]
-  },
-  {
-    id: 'shirt-2', 
-    name: 'Navy Blue Shirt',
-    category: 'clothing',
-    subcategory: 'shirt',
-    description: 'Professional navy blue dress shirt',
-    base_price: 1999,
-    colorHex: '#1E3A8A',
-    variations: [{
-      id: 'shirt-2-var-1',
-      color: 'Navy Blue',
-      colorHex: '#1E3A8A',
-      size: 'M',
-      overlay_image_url: '/api/placeholder/300/400'
+      overlay_image_url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop'
     }]
   },
   {
     id: 'tshirt-1',
     name: 'Red T-Shirt',
-    category: 'clothing', 
+    category: 'clothing',
     subcategory: 'tshirt',
-    description: 'Comfortable red cotton t-shirt',
+    description: 'Comfortable red t-shirt',
     base_price: 899,
     colorHex: '#DC2626',
+    overlay_image_url: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&h=500&fit=crop',
     variations: [{
       id: 'tshirt-1-var-1',
       color: 'Red',
       colorHex: '#DC2626',
       size: 'M',
-      overlay_image_url: '/api/placeholder/300/400'
-    }]
-  },
-  {
-    id: 'tshirt-2',
-    name: 'Green T-Shirt', 
-    category: 'clothing',
-    subcategory: 'tshirt',
-    description: 'Fresh green casual t-shirt',
-    base_price: 899,
-    colorHex: '#16A34A',
-    variations: [{
-      id: 'tshirt-2-var-1',
-      color: 'Green',
-      colorHex: '#16A34A',
-      size: 'M',
-      overlay_image_url: '/api/placeholder/300/400'
+      overlay_image_url: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&h=500&fit=crop'
     }]
   },
   {
     id: 'jacket-1',
     name: 'Black Jacket',
     category: 'clothing',
-    subcategory: 'jacket', 
-    description: 'Stylish black blazer jacket',
+    subcategory: 'jacket',
+    description: 'Stylish black jacket',
     base_price: 3999,
-    colorHex: '#1F2937',
+    colorHex: '#000000',
+    overlay_image_url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&h=500&fit=crop',
     variations: [{
       id: 'jacket-1-var-1',
       color: 'Black',
-      colorHex: '#1F2937',
+      colorHex: '#000000',
       size: 'M',
-      overlay_image_url: '/api/placeholder/300/400'
-    }]
-  },
-  {
-    id: 'dress-1',
-    name: 'Purple Dress',
-    category: 'clothing',
-    subcategory: 'dress',
-    description: 'Elegant purple evening dress',
-    base_price: 2999,
-    colorHex: '#7C3AED',
-    variations: [{
-      id: 'dress-1-var-1',
-      color: 'Purple',
-      colorHex: '#7C3AED',
-      size: 'M',
-      overlay_image_url: '/api/placeholder/300/400'
+      overlay_image_url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&h=500&fit=crop'
     }]
   }
 ];

@@ -11,24 +11,28 @@ const Header = () => {
 
   const navigationItems = [
     {
-      label: 'Get Styled',
-      path: '/photo-upload-analysis',
+      label: 'Virtual Try-On',
+      path: '/virtual-tryon',
       icon: 'Camera',
-      description: 'Upload photo for AI styling'
+      description: 'Try on clothes virtually'
     },
     {
       label: 'My History',
       path: '/user-session-history',
       icon: 'Clock',
       description: 'View past styling sessions'
-    },
-    {
+    }
+  ];
+  
+  // Add admin item only for admin users
+  if (user && user.role === 'admin') {
+    navigationItems.push({
       label: 'Admin',
       path: '/admin-product-management',
       icon: 'Settings',
       description: 'Manage products and analytics'
-    }
-  ];
+    });
+  }
 
   const isActivePath = (path) => {
     if (path === '/admin-product-management') {
@@ -50,7 +54,7 @@ const Header = () => {
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         {/* Logo */}
         <Link 
-          to="/photo-upload-analysis" 
+          to="/virtual-tryon" 
           className="flex items-center space-x-2 hover-scale"
           onClick={closeMobileMenu}
         >
@@ -69,7 +73,7 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
-          {navigationItems?.map((item) => (
+          {navigationItems.map((item) => (
             <Link
               key={item?.path}
               to={item?.path}
@@ -121,7 +125,7 @@ const Header = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-surface border-t border-border shadow-modal">
           <nav className="px-4 py-2 space-y-1">
-            {navigationItems?.map((item) => (
+            {navigationItems.map((item) => (
               <Link
                 key={item?.path}
                 to={item?.path}

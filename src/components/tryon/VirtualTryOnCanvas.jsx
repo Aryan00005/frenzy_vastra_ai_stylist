@@ -261,10 +261,25 @@ export const VirtualTryOnCanvas = forwardRef(({
     const finalWidth = position.width * scaleFactor;
     const finalHeight = position.height * scaleFactor;
 
-    // Apply blend mode for better integration
-    ctx.globalCompositeOperation = 'source-over';
+    // Apply realistic blending
+    const confidence = position.confidence || 1;
+    ctx.globalAlpha = Math.max(0.7, 0.85 + (confidence * 0.15));
+    
+    // Add shadow effect
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
 
-    // Draw product
+    // Apply color tinting if specified
+    if (selectedProduct.colorHex) {
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = selectedProduct.colorHex;
+      ctx.fillRect(-finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // Draw product with enhanced realism
     try {
       ctx.drawImage(
         productImageRef.current,
@@ -273,6 +288,19 @@ export const VirtualTryOnCanvas = forwardRef(({
         finalWidth,
         finalHeight
       );
+      
+      // Add highlight effect
+      const gradient = ctx.createLinearGradient(
+        -finalWidth / 2, -finalHeight / 2,
+        finalWidth / 2, finalHeight / 2
+      );
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = gradient;
+      ctx.fillRect(-finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight);
+      
     } catch (error) {
       console.error('Error rendering product:', error);
     }
